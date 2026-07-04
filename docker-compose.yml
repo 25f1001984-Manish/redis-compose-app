@@ -1,13 +1,18 @@
-FROM python:3.11-slim
+version: "3.9"
 
-WORKDIR /app
+services:
 
-COPY requirements.txt .
+  redis:
+    image: redis:7-alpine
+    restart: always
 
-RUN pip install --no-cache-dir -r requirements.txt
+  api:
+    build: .
+    depends_on:
+      - redis
 
-COPY . .
+    environment:
+      REDIS_HOST: redis
 
-EXPOSE 8000
-
-CMD ["uvicorn","app:app","--host","0.0.0.0","--port","8000"]
+    ports:
+      - "8000:8000"
